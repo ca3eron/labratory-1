@@ -51,9 +51,9 @@ visitors %>% count(admission, setting)
 _Create a frequency table by `admission` and `setting`._
 
 ```{r Ex_b}
-# Delete the comment '#' symbol at the start of the next line and complete the code.
+ #Delete the comment '#' symbol at the start of the next line and complete the code.
 
-#visitors %>% count(_____, _____)
+visitors %>% count(admission, setting)
 ```
 
 
@@ -83,9 +83,9 @@ visitors %>% arrange(desc(n_2022))
 
 _What are the top 10 most visited attractions in 2021?_
 ```{r Ex_c}
-#visitors %>% 
-#  arrange(____(____)) %>%
-#  head(n = ____)
+visitors %>% 
+  arrange(desc(n_2021)) %>%
+head(n = 10)
 ```
 
 ## Question 4
@@ -102,7 +102,7 @@ visitors %>% filter(attraction == "National Museum of Scotland")
 _Which attraction had exactly 565,772 visitors in 2022?_
 
 ```{r Ex_d}
-#visitors %>% filter(___ == ____)
+visitors %>% filter(n_2022 == ____)
 ```
 
 ### Exercise e.
@@ -135,11 +135,11 @@ visitors %>%
 _How many attractions had between 50,000 and 100,000 visitors in 2022?_
 
 ```{r Ex_f}
-#visitors %>% 
-#  ____(
-#    ______,
-#    ______ ) %>%
-#  count()
+visitors %>% 
+  filter(
+    n_2022 > 100000 |
+    n_2022 < 50000) %>%
+  count()
 ```
 
 ### Exercise g.
@@ -147,9 +147,22 @@ _How many attractions had between 50,000 and 100,000 visitors in 2022?_
 _How many regions have more than 50 tourist attraction in the data set? (Hint: You will need to tabulate the data before filtering.)_
 
 ```{r Ex_g}
-#visitors %>% 
-#  _____(region) %>%
-#  filter(______)
+fiftyreg <-
+  visitors %>% 
+  group_by(region) %>%
+  summarise(attraction) %>%
+  count() 
+
+fiftyreg %>%n >= 50)
+
+  
+ 
+    
+  
+
+
+
+
 ```
 
 
@@ -174,11 +187,11 @@ visitors %>%
 _Perform the same calculation for the 2021 admissions data._
 
 ```{r Ex_h}
-#visitors %>% 
-#  ______(
-#    __________,
-#    __________
-#  )
+visitors %>% 
+  summarise(
+    mean_2021 = mean(n_2021),
+    med_2021 = median(n_2021)
+  )
 ```
 
 All values in the output are `NA`!
@@ -187,8 +200,7 @@ All values in the output are `NA`!
 
 _What does `NA` stand for and why are you getting this as your answer to the previous question._
 
-**Write your answer here**
-
+It stands for not applicable/available, the data is missing or doesn't exist.
 
 
 
@@ -196,10 +208,10 @@ _What does `NA` stand for and why are you getting this as your answer to the pre
 
 _Look at the help pages for the `mean()` and `median()` commands to see what the input argument `na.rm` does. Edit your code from exercise h so that it computes the summary statistics where data is available._
 
-**Write your answer here**
-
-
-
+visitors %>% 
+  summarise(
+    mean_2021 = mean(n_2021,na.rm = TRUE) ,
+    med_2021= median(n_2021, na.rm = TRUE)
 
 ## Question 7
 
@@ -218,7 +230,7 @@ visitors %>%
 
 _Observe in question 6 that the mean statistics across all settings are much larger than the corresponding median statistics. Discuss in your group what this suggests about the data._
 
-**Write your answer here**
+The highest values in the data set must be extremely high (and thus be outlines) to be able to right-skew the mean to such an extent. I has a long right tail.
 
 
 
@@ -251,8 +263,10 @@ _How many tourist attractions are there in each of the 4 nations? From this, dis
 
 
 ```{r Ex_l}
-#________ %>%
-#  ______(_______)
+visitors_with_nations %>%
+  group_by(nation)%>%
+  summarise(attraction)%>%
+  count()
 ```
 
 
@@ -265,7 +279,15 @@ _Within each of the 4 nations, what is the proportion of tourist attractions tha
 
 ```{r Ex_m}
 # Write your code here
+ free_n_admission <- visitors_with_nations %>%
+  mutate(
+  admission = case_when(
+    admission == "Free" ~ "Free", 
+           TRUE ~ "Not Free")
+  )
 
+free_n_admission %>%
+  group_by(nation) %>% count(admission) %>% mutate(percent = (n / sum(n)) * 100)
 
 ```
 
@@ -277,6 +299,15 @@ _Calculate the percentage change in visitor admissions from 2021 to 2022. Of the
 ```{r Ex_n}
 # Write your code here
 
+visitors <- visitors %>% 
+  mutate(changeper = (n_2022 - n_2021) / n_2021 * 100)
+
+visitors %>% filter(region == "Scotland") %>% group_by(admission) 
+## %>% summarise(mean_pct_change = mean(changeper, na.rm = TRUE)) %>%
+  arrange(mean_pct_change) 
+
+## GREEN IS CORRECTION WHICH I MISSED
+ 
 
 
 ```
